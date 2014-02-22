@@ -24,8 +24,6 @@ import android.os.Message;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 
-import com.vjt.app.magicscreen.NetworkConnectivityListener.State;
-
 public class ScreenService extends Service {
 
 	private static final String TAG = "InternetService";
@@ -66,15 +64,11 @@ public class ScreenService extends Service {
 
 	private static int serviceStatus = STATUS_NONE;
 	private static int serviceState = STATE_NONE;
-	private static State mConnectivityState = State.UNKNOWN;
 	private static boolean isThisTimeBad;
 
 	private final Handler mHandler = new MainHandler(this);
 	private static int mInterval;
 	private static String mURL;
-
-	// pro
-	public static NetworkConnectivityListener mNetworkConnectivityListener;
 
 	// stat
 	private static long mTxTotal;
@@ -244,12 +238,6 @@ public class ScreenService extends Service {
 		filter.addAction(Intent.ACTION_SCREEN_ON);
 		filter.addAction(Intent.ACTION_SCREEN_OFF);
 		registerReceiver(receiver, filter);
-
-		// pro
-		mNetworkConnectivityListener = new NetworkConnectivityListener();
-		mNetworkConnectivityListener.registerHandler(mHandler,
-				MSG_NETWORK_CHANGED);
-		mNetworkConnectivityListener.startListening(this);
 	}
 
 	@Override
@@ -339,8 +327,7 @@ public class ScreenService extends Service {
 
 		} catch (Exception e) {
 			if (serviceStatus != STATUS_OFF)
-				setupNotification(ScreenService.this,
-						ScreenService.STATUS_OFF);
+				setupNotification(ScreenService.this, ScreenService.STATUS_OFF);
 			serviceStatus = STATUS_OFF;
 			sendBroadcast(new Intent(ACTION_OFFLINE));
 			LogUtil.d(TAG, "Offline !!!");
@@ -350,33 +337,12 @@ public class ScreenService extends Service {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-
-		// pro
-		mNetworkConnectivityListener.unregisterHandler(mHandler);
-		mNetworkConnectivityListener.stopListening();
-		mNetworkConnectivityListener = null;
 		sendBroadcast(new Intent(ACTION_STOPPED));
 
 		resetStatus();
 		unregisterReceiver(receiver);
 		clearNotification(this);
 		stopForeground(true);
-	}
-
-	private void handleNetworkChange() {
-		if (mConnectivityState == State.CONNECTED) {
-			Intent serverService = new Intent(this, ScreenService.class);
-			startService(serverService);
-		} else {
-			if (serviceStatus != STATUS_OFF)
-				setupNotification(ScreenService.this,
-						ScreenService.STATUS_OFF);
-			serviceStatus = STATUS_OFF;
-			sendBroadcast(new Intent(ACTION_OFFLINE));
-			LogUtil.d(TAG, "Offline !!!");
-
-			resetStatus();
-		}
 	}
 
 	// stat
@@ -434,8 +400,7 @@ public class ScreenService extends Service {
 			}
 
 			if (oldTrafficStatus != mTrafficStatus) {
-				setupNotification(ScreenService.this,
-						ScreenService.STATUS_ON);
+				setupNotification(ScreenService.this, ScreenService.STATUS_ON);
 			}
 		}
 		mHandler.sendEmptyMessageDelayed(MSG_NET_STAT, NET_STAT_INTERVAL);
@@ -455,14 +420,6 @@ public class ScreenService extends Service {
 			switch (msg.what) {
 			case MSG_CHECK_TIMEOUT:
 				doBadCheck(service);
-				break;
-			// pro
-			case MSG_NETWORK_CHANGED:
-				if (mNetworkConnectivityListener != null) {
-					mConnectivityState = mNetworkConnectivityListener
-							.getState();
-					handleNetworkChange();
-				}
 				break;
 			// stat
 			case MSG_NET_STAT:

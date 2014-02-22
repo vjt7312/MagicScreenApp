@@ -1,24 +1,17 @@
 package com.vjt.app.magicscreen;
 
 import android.app.Activity;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.View;
-import android.webkit.URLUtil;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
-
-import com.vjt.app.magicscreen.NetworkConnectivityListener.State;
 
 public class MainActivity extends Activity implements OnCheckedChangeListener {
 
@@ -27,13 +20,6 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 	ToggleButton mOnOffButton;
 	// EditText mURL;
 	EditText mInterval;
-	// pro
-	TextView mNtwType;
-	TextView mNtwState;
-	TextView mNtwRoaming;
-	// stat
-	TextView mTX;
-	TextView mRX;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -46,22 +32,14 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 		mInterval = (EditText) findViewById(R.id.interval);
 		// mURL = (EditText) findViewById(R.id.url);
 
-		// pro
-		mNtwType = (TextView) findViewById(R.id.ntw_type);
-		mNtwState = (TextView) findViewById(R.id.ntw_state);
-		mNtwRoaming = (TextView) findViewById(R.id.ntw_roam);
-
-		// stat
-		mTX = (TextView) findViewById(R.id.stat_tx);
-		mRX = (TextView) findViewById(R.id.stat_rx);
-
 		final SharedPreferences settings = PreferenceManager
 				.getDefaultSharedPreferences(this);
 		final SharedPreferences.Editor editor = settings.edit();
 		mInterval.setText(settings.getString("interval",
 				getString(R.string.interval_default)));
 
-		// mURL.setText(settings.getString("url", getString(R.string.url_default)));
+		// mURL.setText(settings.getString("url",
+		// getString(R.string.url_default)));
 
 		if (settings.getString("onoff", getString(R.string.onoff_default))
 				.equals("on")) {
@@ -102,21 +80,21 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 			}
 		});
 
-//		mURL.setOnClickListener(new View.OnClickListener() {
-//			@Override
-//			public void onClick(View v) {
-//				String url = mURL.getText().toString();
-//
-//				if (URLUtil.isValidUrl(url)) {
-//					Toast.makeText(MainActivity.this,
-//							R.string.url_validation_error, Toast.LENGTH_LONG)
-//							.show();
-//					return;
-//				}
-//				editor.putString("url", mURL.getText().toString());
-//				editor.commit();
-//			}
-//		});
+		// mURL.setOnClickListener(new View.OnClickListener() {
+		// @Override
+		// public void onClick(View v) {
+		// String url = mURL.getText().toString();
+		//
+		// if (URLUtil.isValidUrl(url)) {
+		// Toast.makeText(MainActivity.this,
+		// R.string.url_validation_error, Toast.LENGTH_LONG)
+		// .show();
+		// return;
+		// }
+		// editor.putString("url", mURL.getText().toString());
+		// editor.commit();
+		// }
+		// });
 	}
 
 	private void startServer() {
@@ -140,70 +118,7 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 		filter.addAction(ScreenService.ACTION_STOPPED);
 		filter.addAction(ScreenService.ACTION_OFFLINE);
 		filter.addAction(ScreenService.ACTION_STAT);
-		registerReceiver(internetServerReceiver, filter);
 	}
-
-	// pro
-	@Override
-	protected void onPause() {
-		super.onPause();
-
-		unregisterReceiver(internetServerReceiver);
-	}
-
-	// pro
-	private void setNetworkInfo(NetworkInfo info) {
-		if (info == null) {
-			clearNetworkInfo();
-			return;
-		}
-		mNtwType.setText(info.getTypeName()
-				+ ((info.getSubtypeName() == null) ? "" : ("["
-						+ info.getSubtypeName() + "]")));
-		mNtwState.setText(info.getState().toString());
-		mNtwRoaming.setText(info.isRoaming() ? "True" : "False");
-	}
-
-	// pro
-	private void clearNetworkInfo() {
-		mNtwType.setText(getString(R.string.ntw_none_label));
-		mNtwState.setText(getString(R.string.ntw_none_label));
-		mNtwRoaming.setText(getString(R.string.ntw_none_label));
-
-		// stat
-		mTX.setText("0");
-		mRX.setText("0");
-	}
-
-	// pro
-	BroadcastReceiver internetServerReceiver = new BroadcastReceiver() {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			LogUtil.v(TAG,
-					"InternetService action received: " + intent.getAction());
-			if (intent.getAction().equals(ScreenService.ACTION_STARTED)) {
-				if (ScreenService.mNetworkConnectivityListener != null
-						&& ScreenService.mNetworkConnectivityListener
-								.getState() == State.CONNECTED) {
-					setNetworkInfo(ScreenService.mNetworkConnectivityListener
-							.getNetworkInfo());
-				}
-			} else if (intent.getAction()
-					.equals(ScreenService.ACTION_STOPPED)
-					|| intent.getAction()
-							.equals(ScreenService.ACTION_OFFLINE)) {
-				clearNetworkInfo();
-			} else if (intent.getAction().equals(ScreenService.ACTION_STAT)) {
-				if (intent.getBooleanExtra("support", false) == false) {
-					mTX.setText(R.string.stat_unsupport);
-					mRX.setText(R.string.stat_unsupport);
-				} else {
-					mTX.setText(Long.toString(intent.getLongExtra("tx", -1)));
-					mRX.setText(Long.toString(intent.getLongExtra("rx", -1)));
-				}
-			}
-		}
-	};
 
 	@Override
 	public void onCheckedChanged(CompoundButton arg0, boolean arg1) {
