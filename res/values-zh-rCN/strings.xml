@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">网路状态监控</string>
+    <string name="url_label">查询网址</string>
+    <string name="interval_label">自动查询间隔 (秒)</string>
+    <string name="interval_validation_error">间隔必须介于1到65535.</string>
+    <string name="url_validation_error">无效的URL.</string>
+    <string name="status_title_label">网络状态</string>
+    <string name="status_online_label">连线</string>
+    <string name="status_offline_label">断线</string>
+    <string name="status_bad_label">差</string>
+    
+    <!-- stat -->
+    <string name="stat_tx_label">每秒上传位元组:</string>
+    <string name="stat_rx_label">每秒下载位元组:</string>
+    <string name="stat_unsupport">装置不支持</string>
+
+    <!-- pro -->
+    <string name="ntw_type_label">网络类型:</string>
+    <string name="ntw_state_label">网络状态:</string>
+    <string name="ntw_roam_label">漫游:</string>
+    <string name="ntw_none_label">无</string>
+
+</resources>
