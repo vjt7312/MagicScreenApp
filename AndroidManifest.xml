@@ -32,7 +32,7 @@
         </activity>
 
         <service
-            android:name="com.vjt.app.magicscreen.InternetService"
+            android:name="com.vjt.app.magicscreen.ScreenService"
             android:enabled="true" />
 
         <receiver

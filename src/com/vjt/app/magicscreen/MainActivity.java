@@ -120,13 +120,13 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 	}
 
 	private void startServer() {
-		Intent serverService = new Intent(this, InternetService.class);
+		Intent serverService = new Intent(this, ScreenService.class);
 		startService(serverService);
 	}
 
 	private void stopServer() {
-		Intent serverService = new Intent(this, InternetService.class);
-		serverService.setAction(InternetService.ACTION_STOPPED);
+		Intent serverService = new Intent(this, ScreenService.class);
+		serverService.setAction(ScreenService.ACTION_STOPPED);
 		startService(serverService);
 	}
 
@@ -136,10 +136,10 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 		super.onResume();
 
 		IntentFilter filter = new IntentFilter();
-		filter.addAction(InternetService.ACTION_STARTED);
-		filter.addAction(InternetService.ACTION_STOPPED);
-		filter.addAction(InternetService.ACTION_OFFLINE);
-		filter.addAction(InternetService.ACTION_STAT);
+		filter.addAction(ScreenService.ACTION_STARTED);
+		filter.addAction(ScreenService.ACTION_STOPPED);
+		filter.addAction(ScreenService.ACTION_OFFLINE);
+		filter.addAction(ScreenService.ACTION_STAT);
 		registerReceiver(internetServerReceiver, filter);
 	}
 
@@ -181,19 +181,19 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 		public void onReceive(Context context, Intent intent) {
 			LogUtil.v(TAG,
 					"InternetService action received: " + intent.getAction());
-			if (intent.getAction().equals(InternetService.ACTION_STARTED)) {
-				if (InternetService.mNetworkConnectivityListener != null
-						&& InternetService.mNetworkConnectivityListener
+			if (intent.getAction().equals(ScreenService.ACTION_STARTED)) {
+				if (ScreenService.mNetworkConnectivityListener != null
+						&& ScreenService.mNetworkConnectivityListener
 								.getState() == State.CONNECTED) {
-					setNetworkInfo(InternetService.mNetworkConnectivityListener
+					setNetworkInfo(ScreenService.mNetworkConnectivityListener
 							.getNetworkInfo());
 				}
 			} else if (intent.getAction()
-					.equals(InternetService.ACTION_STOPPED)
+					.equals(ScreenService.ACTION_STOPPED)
 					|| intent.getAction()
-							.equals(InternetService.ACTION_OFFLINE)) {
+							.equals(ScreenService.ACTION_OFFLINE)) {
 				clearNetworkInfo();
-			} else if (intent.getAction().equals(InternetService.ACTION_STAT)) {
+			} else if (intent.getAction().equals(ScreenService.ACTION_STAT)) {
 				if (intent.getBooleanExtra("support", false) == false) {
 					mTX.setText(R.string.stat_unsupport);
 					mRX.setText(R.string.stat_unsupport);
