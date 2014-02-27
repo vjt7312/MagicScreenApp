@@ -13,14 +13,20 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
+import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 
-public class ScreenService extends Service {
+public class ScreenService extends Service implements SensorEventListener {
 
 	private static final String TAG = "InternetService";
 
@@ -44,6 +50,8 @@ public class ScreenService extends Service {
 
 	private static int mInterval;
 	private static String mURL;
+	private WakeLock mWakeLock;
+	private SensorManager mSensorManager;
 
 	private final IBinder binder = new InternetServiceBinder();
 
@@ -187,6 +195,8 @@ public class ScreenService extends Service {
 
 	@Override
 	public void onCreate() {
+		mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(Intent.ACTION_SCREEN_ON);
 		filter.addAction(Intent.ACTION_SCREEN_OFF);
@@ -207,6 +217,9 @@ public class ScreenService extends Service {
 			mInterval = Integer.valueOf(settings.getString("interval",
 					getString(R.string.interval_default)));
 			mURL = settings.getString("url", getString(R.string.url_default));
+			mSensorManager.registerListener(this,
+					mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
+					SensorManager.SENSOR_DELAY_NORMAL);
 			doCheck();
 		} else if (intent.getAction().equals(ACTION_STOPPED)) {
 			stopSelf(startId);
@@ -247,6 +260,7 @@ public class ScreenService extends Service {
 	private void resetStatus() {
 		serviceStatus = STATUS_NONE;
 		cancelWatchdog();
+		mSensorManager.unregisterListener(this);
 	}
 
 	private void doCheck() {
@@ -273,6 +287,42 @@ public class ScreenService extends Service {
 		unregisterReceiver(receiver);
 		clearNotification(this);
 		stopForeground(true);
+	}
+
+	private void acquireWakeLock() {
+		if (null == mWakeLock) {
+			PowerManager pm = (PowerManager) this
+					.getSystemService(Context.POWER_SERVICE);
+			mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK
+					| PowerManager.ON_AFTER_RELEASE, "com.vjt.app.magicscreen");
+			if (null != mWakeLock) {
+				mWakeLock.acquire();
+			}
+		}
+	}
+
+	private void releaseWakeLock() {
+		if (null != mWakeLock) {
+			mWakeLock.release();
+			mWakeLock = null;
+		}
+	}
+
+	public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+	}
+
+	public void onSensorChanged(SensorEvent event) {
+
+		if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+			float x = event.values[0];
+			float y = event.values[1];
+			float z = event.values[2];
+
+			LogUtil.d(TAG, "x = " + x);
+			LogUtil.d(TAG, "y = " + y);
+			LogUtil.d(TAG, "z = " + y);
+		}
 	}
 
 }
