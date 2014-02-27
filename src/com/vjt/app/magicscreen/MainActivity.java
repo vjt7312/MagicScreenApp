@@ -4,16 +4,22 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-public class MainActivity extends Activity implements OnCheckedChangeListener {
+public class MainActivity extends Activity implements OnCheckedChangeListener,
+		SensorEventListener {
 
 	private static final String TAG = "MainActivity";
 
@@ -21,10 +27,25 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 	// EditText mURL;
 	EditText mInterval;
 
+	TextView xCoor; // declare X axis object
+	TextView yCoor; // declare Y axis object
+	TextView zCoor; // declare Z axis object
+	private SensorManager sensorManager;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+
+		xCoor = (TextView) findViewById(R.id.xcoor); // create X axis object
+		yCoor = (TextView) findViewById(R.id.ycoor); // create Y axis object
+		zCoor = (TextView) findViewById(R.id.zcoor); // create Z axis object
+
+		sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+		// add listener. The listener will be HelloAndroid (this) class
+		sensorManager.registerListener(this,
+				sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
+				SensorManager.SENSOR_DELAY_NORMAL);
 
 		mOnOffButton = (ToggleButton) findViewById(R.id.running_state_toogle_button);
 		mOnOffButton.setOnCheckedChangeListener(this);
@@ -117,7 +138,6 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 		filter.addAction(ScreenService.ACTION_STARTED);
 		filter.addAction(ScreenService.ACTION_STOPPED);
 		filter.addAction(ScreenService.ACTION_OFFLINE);
-		filter.addAction(ScreenService.ACTION_STAT);
 	}
 
 	@Override
@@ -148,6 +168,26 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 			stopServer();
 		}
 
+	}
+
+	public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+	}
+
+	public void onSensorChanged(SensorEvent event) {
+
+		// check sensor type
+		if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+
+			// assign directions
+			float x = event.values[0];
+			float y = event.values[1];
+			float z = event.values[2];
+
+			xCoor.setText("X: " + x);
+			yCoor.setText("Y: " + y);
+			zCoor.setText("Z: " + z);
+		}
 	}
 
 }

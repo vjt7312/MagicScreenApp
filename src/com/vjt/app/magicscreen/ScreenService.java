@@ -1,6 +1,5 @@
 package com.vjt.app.magicscreen;
 
-import java.lang.ref.WeakReference;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
@@ -14,13 +13,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.net.TrafficStats;
 import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.Build;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Message;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 
@@ -34,9 +30,6 @@ public class ScreenService extends Service {
 	public static final String ACTION_OFFLINE = "com.vjt.app.magicscreen.OFFLINE";
 	public static final String ACTION_BAD = "com.vjt.app.magicscreen.BAD";
 
-	// stat
-	public static final String ACTION_STAT = "com.vjt.app.magicscreen.STAT";
-
 	public static final String ACTION_SCREEN_ON = "screen_on";
 	public static final String ACTION_SCREEN_OFF = "screen_off";
 
@@ -45,38 +38,12 @@ public class ScreenService extends Service {
 	private static final int STATUS_OFF = 2;
 	private static final int STATUS_BAD = 3;
 
-	private static final int STATE_NONE = 0;
-	private static final int STATE_WAITING = 1;
-
-	private static final int MSG_CHECK_TIMEOUT = 1;
-	// pro
-	private static final int MSG_NETWORK_CHANGED = 2;
-	// stat
-	private static final int MSG_NET_STAT = 3;
-	private static final int TRAFFIC_NONE = 0;
-	private static final int TRAFFIC_LOW = 1;
-	private static final int TRAFFIC_HIGH = 2;
-
-	private static final int NET_STAT_INTERVAL = 1000;
-	private static final int NET_STAT_HIGH_THRESHOLD = 1024 * 512;
-
-	private final int NOTIFICATIONID = 7696;
+	private final int NOTIFICATIONID = 7656;
 
 	private static int serviceStatus = STATUS_NONE;
-	private static int serviceState = STATE_NONE;
-	private static boolean isThisTimeBad;
 
-	private final Handler mHandler = new MainHandler(this);
 	private static int mInterval;
 	private static String mURL;
-
-	// stat
-	private static long mTxTotal;
-	private static long mRxTotal;
-	private static long mTxSec;
-	private static long mRxSec;
-	private static int mTrafficStatus;
-	private static boolean mSupport = true;
 
 	private final IBinder binder = new InternetServiceBinder();
 
@@ -106,13 +73,7 @@ public class ScreenService extends Service {
 
 		switch (status) {
 		case ScreenService.STATUS_ON:
-			if (mTrafficStatus == TRAFFIC_HIGH) {
-				icon = R.drawable.hightraffic;
-			} else if (mTrafficStatus == TRAFFIC_LOW) {
-				icon = R.drawable.traffic;
-			} else {
-				icon = R.drawable.online;
-			}
+			icon = R.drawable.online;
 			status_label = R.string.status_online_label;
 			break;
 		case ScreenService.STATUS_OFF:
@@ -172,13 +133,7 @@ public class ScreenService extends Service {
 			InetAddress addr = null;
 			try {
 				synchronized (this) {
-					serviceState = STATE_WAITING;
-					mHandler.sendEmptyMessageDelayed(
-							MSG_CHECK_TIMEOUT,
-							Integer.valueOf(getString(R.string.bad_interval_default)) * 1000);
-
 					addr = InetAddress.getByName(params[0]);
-					serviceState = STATE_NONE;
 				}
 			} catch (UnknownHostException e) {
 				return null;
@@ -198,12 +153,10 @@ public class ScreenService extends Service {
 				sendBroadcast(new Intent(ACTION_OFFLINE));
 				LogUtil.d(TAG, "Offline !!!");
 			} else {
-				if (!isThisTimeBad) {
-					if (serviceStatus != STATUS_ON)
-						setupNotification(ScreenService.this,
-								ScreenService.STATUS_ON);
-					serviceStatus = STATUS_ON;
-				}
+				if (serviceStatus != STATUS_ON)
+					setupNotification(ScreenService.this,
+							ScreenService.STATUS_ON);
+				serviceStatus = STATUS_ON;
 				LogUtil.d(TAG, netAddress);
 			}
 			setWatchdog(mInterval * 1000);
@@ -244,7 +197,6 @@ public class ScreenService extends Service {
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		super.onStartCommand(intent, flags, startId);
 
-		mHandler.removeMessages(MSG_CHECK_TIMEOUT);
 		cancelWatchdog();
 
 		if (intent.getAction() == null
@@ -255,8 +207,6 @@ public class ScreenService extends Service {
 			mInterval = Integer.valueOf(settings.getString("interval",
 					getString(R.string.interval_default)));
 			mURL = settings.getString("url", getString(R.string.url_default));
-
-			isThisTimeBad = false;
 			doCheck();
 		} else if (intent.getAction().equals(ACTION_STOPPED)) {
 			stopSelf(startId);
@@ -266,13 +216,6 @@ public class ScreenService extends Service {
 			return START_REDELIVER_INTENT;
 		}
 
-		if (mSupport) {
-			doStat(true);
-		} else {
-			Intent i = new Intent(ACTION_STAT);
-			i.putExtra("support", false);
-			sendBroadcast(i);
-		}
 		sendBroadcast(new Intent(ACTION_STARTED));
 		return START_REDELIVER_INTENT;
 	}
@@ -301,22 +244,9 @@ public class ScreenService extends Service {
 		alarmMgr.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, nextCheckTime, pi);
 	}
 
-	private void doBadCheck(Context service) {
-		if (serviceState == STATE_WAITING && serviceStatus == STATUS_ON) {
-			if (serviceStatus != STATUS_BAD && service != null)
-				setupNotification(this, ScreenService.STATUS_BAD);
-			serviceStatus = STATUS_BAD;
-			isThisTimeBad = true;
-			LogUtil.d(TAG, "Bad connection !!!");
-		}
-	}
-
 	private void resetStatus() {
 		serviceStatus = STATUS_NONE;
-		mTrafficStatus = TRAFFIC_NONE;
 		cancelWatchdog();
-		mHandler.removeMessages(MSG_CHECK_TIMEOUT);
-		mHandler.removeMessages(MSG_NET_STAT);
 	}
 
 	private void doCheck() {
@@ -343,90 +273,6 @@ public class ScreenService extends Service {
 		unregisterReceiver(receiver);
 		clearNotification(this);
 		stopForeground(true);
-	}
-
-	// stat
-	private static void getTx() {
-		mTxTotal = TrafficStats.getTotalTxBytes();
-		LogUtil.i(TAG, "TX = " + mTxTotal);
-	}
-
-	private static void getRx() {
-		mRxTotal = TrafficStats.getTotalRxBytes();
-		LogUtil.i(TAG, "RX = " + mRxTotal);
-	}
-
-	private void doStat(boolean isFirst) {
-		long rxTotal = mRxTotal;
-		long txTotal = mTxTotal;
-		getTx();
-		getRx();
-
-		if (isFirst && mRxTotal > 0 && mRxTotal > 0
-				&& mHandler.hasMessages(MSG_NET_STAT)) {
-			return;
-		}
-
-		if (mRxTotal < 0 || mTxTotal < 0) {
-			mSupport = false;
-			Intent i = new Intent(ACTION_STAT);
-			i.putExtra("support", false);
-			sendBroadcast(i);
-			return;
-		} else {
-			mSupport = true;
-		}
-
-		if (!isFirst) {
-			mRxSec = mRxTotal - rxTotal;
-			mTxSec = mTxTotal - txTotal;
-			Intent i = new Intent(ACTION_STAT);
-			i.putExtra("rx", mRxSec);
-			i.putExtra("tx", mTxSec);
-			i.putExtra("support", true);
-			sendBroadcast(i);
-			LogUtil.i(TAG, "RX Bytes/s = " + mRxSec);
-			LogUtil.i(TAG, "TX Bytes/s = " + mTxSec);
-
-			int oldTrafficStatus = mTrafficStatus;
-
-			if (mRxSec == 0 && mTxSec == 0) {
-				mTrafficStatus = TRAFFIC_NONE;
-			} else if (mRxSec >= NET_STAT_HIGH_THRESHOLD
-					|| mTxSec >= NET_STAT_HIGH_THRESHOLD) {
-				mTrafficStatus = TRAFFIC_HIGH;
-			} else {
-				mTrafficStatus = TRAFFIC_LOW;
-			}
-
-			if (oldTrafficStatus != mTrafficStatus) {
-				setupNotification(ScreenService.this, ScreenService.STATUS_ON);
-			}
-		}
-		mHandler.sendEmptyMessageDelayed(MSG_NET_STAT, NET_STAT_INTERVAL);
-	}
-
-	private class MainHandler extends Handler {
-		private final WeakReference<ScreenService> mService;
-
-		MainHandler(ScreenService service) {
-			mService = new WeakReference<ScreenService>(service);
-		}
-
-		@Override
-		public void handleMessage(Message msg) {
-			ScreenService service = mService.get();
-
-			switch (msg.what) {
-			case MSG_CHECK_TIMEOUT:
-				doBadCheck(service);
-				break;
-			// stat
-			case MSG_NET_STAT:
-				doStat(false);
-				break;
-			}
-		}
 	}
 
 }

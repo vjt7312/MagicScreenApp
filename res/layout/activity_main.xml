@@ -29,7 +29,7 @@
             android:inputType="textUri"
             android:text="@string/url_default" >
         </EditText>
-    </LinearLayout>
+    </LinearLayout>
     -->
 
     <LinearLayout
@@ -68,6 +68,35 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center" >
         </ToggleButton>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="10dp"
+        android:paddingTop="10dp" >
+
+        <TextView
+            android:id="@+id/xcoor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="X Coordinate: "
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/ycoor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Y Coordinate: "
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/zcoor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Z Coordinate: "
+            android:textAppearance="?android:attr/textAppearanceMedium" />
     </LinearLayout>
 
 </LinearLayout>
