@@ -1,8 +1,5 @@
 package com.vjt.app.magicscreen;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-
 import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -17,7 +14,6 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
@@ -42,14 +38,12 @@ public class ScreenService extends Service implements SensorEventListener {
 	private static final int STATUS_NONE = 0;
 	private static final int STATUS_ON = 1;
 	private static final int STATUS_OFF = 2;
-	private static final int STATUS_BAD = 3;
 
 	private final int NOTIFICATIONID = 7656;
 
 	private static int serviceStatus = STATUS_NONE;
 
 	private static int mInterval;
-	private static String mURL;
 	private WakeLock mWakeLock;
 	private SensorManager mSensorManager;
 
@@ -87,10 +81,6 @@ public class ScreenService extends Service implements SensorEventListener {
 		case ScreenService.STATUS_OFF:
 			icon = R.drawable.offline;
 			status_label = R.string.status_offline_label;
-			break;
-		case ScreenService.STATUS_BAD:
-			icon = R.drawable.bad;
-			status_label = R.string.status_bad_label;
 			break;
 		default:
 			icon = R.drawable.offline;
@@ -133,42 +123,6 @@ public class ScreenService extends Service implements SensorEventListener {
 		NotificationManager nm = (NotificationManager) context
 				.getSystemService(ns);
 		nm.cancelAll();
-	}
-
-	public class NetTask extends AsyncTask<String, Integer, String> {
-		@Override
-		protected String doInBackground(String... params) {
-			InetAddress addr = null;
-			try {
-				synchronized (this) {
-					addr = InetAddress.getByName(params[0]);
-				}
-			} catch (UnknownHostException e) {
-				return null;
-			} catch (Exception e) {
-				return null;
-			}
-			return addr.getHostAddress();
-		}
-
-		@Override
-		protected void onPostExecute(String netAddress) {
-			if (netAddress == null) {
-				if (serviceStatus != STATUS_OFF)
-					setupNotification(ScreenService.this,
-							ScreenService.STATUS_OFF);
-				serviceStatus = STATUS_OFF;
-				sendBroadcast(new Intent(ACTION_OFFLINE));
-				LogUtil.d(TAG, "Offline !!!");
-			} else {
-				if (serviceStatus != STATUS_ON)
-					setupNotification(ScreenService.this,
-							ScreenService.STATUS_ON);
-				serviceStatus = STATUS_ON;
-				LogUtil.d(TAG, netAddress);
-			}
-			setWatchdog(mInterval * 1000);
-		}
 	}
 
 	BroadcastReceiver receiver = new BroadcastReceiver() {
@@ -216,11 +170,9 @@ public class ScreenService extends Service implements SensorEventListener {
 
 			mInterval = Integer.valueOf(settings.getString("interval",
 					getString(R.string.interval_default)));
-			mURL = settings.getString("url", getString(R.string.url_default));
 			mSensorManager.registerListener(this,
 					mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
 					SensorManager.SENSOR_DELAY_NORMAL);
-			doCheck();
 		} else if (intent.getAction().equals(ACTION_STOPPED)) {
 			stopSelf(startId);
 			return START_NOT_STICKY;
@@ -263,21 +215,6 @@ public class ScreenService extends Service implements SensorEventListener {
 		mSensorManager.unregisterListener(this);
 	}
 
-	private void doCheck() {
-
-		try {
-
-			new NetTask().execute(mURL);
-
-		} catch (Exception e) {
-			if (serviceStatus != STATUS_OFF)
-				setupNotification(ScreenService.this, ScreenService.STATUS_OFF);
-			serviceStatus = STATUS_OFF;
-			sendBroadcast(new Intent(ACTION_OFFLINE));
-			LogUtil.d(TAG, "Offline !!!");
-		}
-	}
-
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
@@ -293,7 +230,7 @@ public class ScreenService extends Service implements SensorEventListener {
 		if (null == mWakeLock) {
 			PowerManager pm = (PowerManager) this
 					.getSystemService(Context.POWER_SERVICE);
-			mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK
+			mWakeLock = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK
 					| PowerManager.ON_AFTER_RELEASE, "com.vjt.app.magicscreen");
 			if (null != mWakeLock) {
 				mWakeLock.acquire();
@@ -318,11 +255,29 @@ public class ScreenService extends Service implements SensorEventListener {
 			float x = event.values[0];
 			float y = event.values[1];
 			float z = event.values[2];
+			int oldServiceStatus = serviceStatus;
 
 			LogUtil.d(TAG, "x = " + x);
 			LogUtil.d(TAG, "y = " + y);
-			LogUtil.d(TAG, "z = " + y);
+			LogUtil.d(TAG, "z = " + z);
+
+			if (y > 0.4f) {
+				serviceStatus = STATUS_ON;
+				acquireWakeLock();
+				if (oldServiceStatus != serviceStatus) {
+					setupNotification(this, STATUS_ON);
+				}
+			} else {
+				serviceStatus = STATUS_OFF;
+				releaseWakeLock();
+				if (oldServiceStatus != serviceStatus) {
+					setupNotification(this, STATUS_OFF);
+				}
+			}
 		}
+		LogUtil.d(TAG, "serviceStatus = " + serviceStatus);
+		mSensorManager.unregisterListener(this);
+		setWatchdog(mInterval * 1000);
 	}
 
 }
