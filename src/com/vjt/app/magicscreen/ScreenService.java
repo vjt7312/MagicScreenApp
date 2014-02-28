@@ -44,6 +44,7 @@ public class ScreenService extends Service implements SensorEventListener {
 	private static int serviceStatus = STATUS_NONE;
 
 	private static int mFrequency;
+	private static float mSensitivity;
 	private WakeLock mWakeLock;
 	private SensorManager mSensorManager;
 
@@ -168,7 +169,7 @@ public class ScreenService extends Service implements SensorEventListener {
 			SharedPreferences settings = PreferenceManager
 					.getDefaultSharedPreferences(this);
 
-			int f = (settings.getInt("frenqucy", 2));
+			int f = (settings.getInt("frenqucy", 1));
 			switch (f) {
 			case 0:
 				mFrequency = Integer
@@ -181,6 +182,22 @@ public class ScreenService extends Service implements SensorEventListener {
 			case 2:
 				mFrequency = Integer
 						.parseInt(getString(R.string.interval_2_default));
+				break;
+			}
+
+			int s = (settings.getInt("sensitivity", 1));
+			switch (s) {
+			case 0:
+				mSensitivity = Float
+						.parseFloat(getString(R.string.sensitivity_0_default));
+				break;
+			case 1:
+				mSensitivity = Float
+						.parseFloat(getString(R.string.sensitivity_1_default));
+				break;
+			case 2:
+				mSensitivity = Float
+						.parseFloat(getString(R.string.sensitivity_2_default));
 				break;
 			}
 			mSensorManager.registerListener(this,
@@ -274,7 +291,7 @@ public class ScreenService extends Service implements SensorEventListener {
 			LogUtil.d(TAG, "y = " + y);
 			LogUtil.d(TAG, "z = " + z);
 
-			if (y > 0.4f) {
+			if (Math.abs(y) > mSensitivity) {
 				serviceStatus = STATUS_ON;
 				if (oldServiceStatus != serviceStatus) {
 					acquireWakeLock();

@@ -6,6 +6,7 @@
     <string name="interval_0_label">Low</string>
     <string name="interval_1_label">Medium</string>
     <string name="interval_2_label">High</string>
+    <string name="sensitivity_label">Sensitivity</string>
     <string name="status_online_label">On</string>
     <string name="status_offline_label">Off</string>
     <string name="status_title_label">Smart Screen</string>
@@ -15,5 +16,8 @@
     <string name="interval_0_default">4</string>
     <string name="interval_1_default">2</string>
     <string name="interval_2_default">1</string>
+    <string name="sensitivity_0_default">0.15</string>
+    <string name="sensitivity_1_default">0.4</string>
+    <string name="sensitivity_2_default">1</string>
 
 </resources>

@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">知恵画面を</string>
+    <string name="app_name">スマートスクリーン</string>
     <string name="interval_label">検査の頻度 </string>
     <string name="interval_0_label">低い </string>
     <string name="interval_1_label">で </string>
     <string name="interval_2_label">高い</string>
+    <string name="sensitivity_label">感度</string>
     <string name="status_online_label">アクティブ </string>
     <string name="status_offline_label">影響なし</string>
-    <string name="status_title_label">知恵画面を</string>
+    <string name="status_title_label">スマートスクリーン</string>
 
 </resources>

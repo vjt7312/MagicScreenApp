@@ -6,6 +6,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.SeekBar;
@@ -16,8 +17,8 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 	private static final String TAG = "MainActivity";
 
 	ToggleButton mOnOffButton;
-	// EditText mURL;
-	SeekBar mSeekbar;
+	SeekBar mSeekbar1;
+	SeekBar mSeekbar2;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -27,22 +28,26 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 		mOnOffButton = (ToggleButton) findViewById(R.id.running_state_toogle_button);
 		mOnOffButton.setOnCheckedChangeListener(this);
 
-		mSeekbar = (SeekBar) findViewById(R.id.seekBar);
+		mSeekbar1 = (SeekBar) findViewById(R.id.seekBar1);
+		mSeekbar2 = (SeekBar) findViewById(R.id.seekBar2);
 
 		final SharedPreferences settings = PreferenceManager
 				.getDefaultSharedPreferences(this);
 		final SharedPreferences.Editor editor = settings.edit();
-		mSeekbar.setProgress(settings.getInt("frequency", 1));
+		mSeekbar1.setProgress(settings.getInt("frequency", 1));
+		mSeekbar2.setProgress(settings.getInt("sensitivity", 1));
 
 		if (settings.getString("onoff", getString(R.string.onoff_default))
 				.equals("on")) {
-			mSeekbar.setEnabled(false);
+			mSeekbar1.setEnabled(false);
+			mSeekbar2.setEnabled(false);
 			mOnOffButton.setChecked(true);
 			editor.putString("onoff", "on");
 			editor.commit();
 			startServer();
 		} else {
-			mSeekbar.setEnabled(true);
+			mSeekbar1.setEnabled(true);
+			mSeekbar2.setEnabled(true);
 			mOnOffButton.setChecked(false);
 			editor.putString("onoff", "off");
 			editor.commit();
@@ -79,11 +84,13 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 					.getDefaultSharedPreferences(this);
 			final SharedPreferences.Editor editor = settings.edit();
 
-			editor.putInt("frenqucy", mSeekbar.getProgress());
+			editor.putInt("frequency", mSeekbar1.getProgress());
+			editor.putInt("sensitivity", mSeekbar2.getProgress());
 			editor.putString("onoff", "on");
 			editor.commit();
 
-			mSeekbar.setEnabled(false);
+			mSeekbar1.setEnabled(false);
+			mSeekbar2.setEnabled(false);
 			startServer();
 		} else {
 			final SharedPreferences settings = PreferenceManager
@@ -93,7 +100,8 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 			editor.putString("onoff", "off");
 			editor.commit();
 
-			mSeekbar.setEnabled(true);
+			mSeekbar1.setEnabled(true);
+			mSeekbar2.setEnabled(true);
 			stopServer();
 		}
 
