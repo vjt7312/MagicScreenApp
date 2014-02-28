@@ -2,14 +2,18 @@
 <resources>
 
     <string name="app_name">Smart Screen</string>
-    <string name="interval_label">Check interval (seconds)</string>
-    <string name="interval_validation_error">The interval must be in the range 2 to 65535.</string>
+    <string name="interval_label">Check frequency</string>
+    <string name="interval_0_label">Low</string>
+    <string name="interval_1_label">Medium</string>
+    <string name="interval_2_label">High</string>
     <string name="status_online_label">On</string>
     <string name="status_offline_label">Off</string>
     <string name="status_title_label">Smart Screen</string>
 
     <!-- Configuration values, do not translate -->
     <string name="onoff_default">off</string>
-    <string name="interval_default">2</string>
+    <string name="interval_0_default">4</string>
+    <string name="interval_1_default">2</string>
+    <string name="interval_2_default">1</string>
 
 </resources>

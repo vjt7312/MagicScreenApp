@@ -2,14 +2,12 @@
 <resources>
 
     <string name="app_name">智慧萤幕</string>
-    <string name="interval_label">检查间格 (秒)</string>
-    <string name="interval_validation_error">间格必须在2到65535之间.</string>
+    <string name="interval_label">检查频率</string>
+    <string name="interval_0_label">低</string>
+    <string name="interval_1_label">中</string>
+    <string name="interval_2_label">高</string>
     <string name="status_online_label">作用中</string>
     <string name="status_offline_label">无作用</string>
     <string name="status_title_label">智慧萤幕</string>
-
-    <!-- Configuration values, do not translate -->
-    <string name="onoff_default">off</string>
-    <string name="interval_default">2</string>
 
 </resources>

@@ -2,14 +2,12 @@
 <resources>
 
     <string name="app_name">知恵画面を</string>
-    <string name="interval_label">レイアウトを確認（S） </string>
-    <string name="interval_validation_error">レイアウトは2から65535の間でなければなりません.</string>
+    <string name="interval_label">検査の頻度 </string>
+    <string name="interval_0_label">低い </string>
+    <string name="interval_1_label">で </string>
+    <string name="interval_2_label">高い</string>
     <string name="status_online_label">アクティブ </string>
     <string name="status_offline_label">影響なし</string>
     <string name="status_title_label">知恵画面を</string>
-
-    <!-- Configuration values, do not translate -->
-    <string name="onoff_default">off</string>
-    <string name="interval_default">2</string>
 
 </resources>

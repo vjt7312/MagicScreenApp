@@ -2,14 +2,12 @@
 <resources>
 
     <string name="app_name">智慧螢幕</string>
-    <string name="interval_label">檢查間格 (秒)</string>
-    <string name="interval_validation_error">間格必須在2到65535之間.</string>
+    <string name="interval_label">檢查頻率</string>
+    <string name="interval_0_label">低</string>
+    <string name="interval_1_label">中</string>
+    <string name="interval_2_label">高</string>
     <string name="status_online_label">作用中</string>
     <string name="status_offline_label">無作用</string>
     <string name="status_title_label">智慧螢幕</string>
-
-    <!-- Configuration values, do not translate -->
-    <string name="onoff_default">off</string>
-    <string name="interval_default">2</string>
 
 </resources>

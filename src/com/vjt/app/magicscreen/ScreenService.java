@@ -24,7 +24,7 @@ import android.preference.PreferenceManager;
 
 public class ScreenService extends Service implements SensorEventListener {
 
-	private static final String TAG = "InternetService";
+	private static final String TAG = "ScreenService";
 
 	public static final String ACTION_STARTED = "com.vjt.app.magicscreen.STARTED";
 	public static final String ACTION_STOPPED = "com.vjt.app.magicscreen.STOPPED";
@@ -43,7 +43,7 @@ public class ScreenService extends Service implements SensorEventListener {
 
 	private static int serviceStatus = STATUS_NONE;
 
-	private static int mInterval;
+	private static int mFrequency;
 	private WakeLock mWakeLock;
 	private SensorManager mSensorManager;
 
@@ -168,8 +168,21 @@ public class ScreenService extends Service implements SensorEventListener {
 			SharedPreferences settings = PreferenceManager
 					.getDefaultSharedPreferences(this);
 
-			mInterval = Integer.valueOf(settings.getString("interval",
-					getString(R.string.interval_default)));
+			int f = (settings.getInt("frenqucy", 2));
+			switch (f) {
+			case 0:
+				mFrequency = Integer
+						.parseInt(getString(R.string.interval_0_default));
+				break;
+			case 1:
+				mFrequency = Integer
+						.parseInt(getString(R.string.interval_1_default));
+				break;
+			case 2:
+				mFrequency = Integer
+						.parseInt(getString(R.string.interval_2_default));
+				break;
+			}
 			mSensorManager.registerListener(this,
 					mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
 					SensorManager.SENSOR_DELAY_NORMAL);
@@ -230,7 +243,7 @@ public class ScreenService extends Service implements SensorEventListener {
 		if (null == mWakeLock) {
 			PowerManager pm = (PowerManager) this
 					.getSystemService(Context.POWER_SERVICE);
-			mWakeLock = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK
+			mWakeLock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK
 					| PowerManager.ON_AFTER_RELEASE, "com.vjt.app.magicscreen");
 			if (null != mWakeLock) {
 				mWakeLock.acquire();
@@ -263,21 +276,23 @@ public class ScreenService extends Service implements SensorEventListener {
 
 			if (y > 0.4f) {
 				serviceStatus = STATUS_ON;
-				acquireWakeLock();
 				if (oldServiceStatus != serviceStatus) {
+					acquireWakeLock();
+					releaseWakeLock();
+					acquireWakeLock();
 					setupNotification(this, STATUS_ON);
 				}
 			} else {
 				serviceStatus = STATUS_OFF;
-				releaseWakeLock();
 				if (oldServiceStatus != serviceStatus) {
+					releaseWakeLock();
 					setupNotification(this, STATUS_OFF);
 				}
 			}
 		}
 		LogUtil.d(TAG, "serviceStatus = " + serviceStatus);
 		mSensorManager.unregisterListener(this);
-		setWatchdog(mInterval * 1000);
+		setWatchdog(mFrequency * 1000);
 	}
 
 }
