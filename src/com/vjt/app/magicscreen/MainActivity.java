@@ -6,24 +6,53 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.ToggleButton;
+
+import com.google.ads.AdRequest;
+import com.google.ads.AdSize;
+import com.google.ads.AdView;
 
 public class MainActivity extends Activity implements OnCheckedChangeListener {
 
 	private static final String TAG = "MainActivity";
 
+	private static final String MY_AD_UNIT_ID = "a1530ffcf0970cd";
+
 	ToggleButton mOnOffButton;
 	SeekBar mSeekbar1;
 	SeekBar mSeekbar2;
+
+	private AdView adView;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+
+		// ---------------------------------------------------------------------
+		// 建立 adView
+		adView = new AdView(this, AdSize.BANNER, MY_AD_UNIT_ID);
+
+		// 查詢 LinearLayout (假設您已經提供)
+		// 屬性是 android:id="@+id/mainLayout"
+		LinearLayout layout = (LinearLayout) findViewById(R.id.mainLayout);
+
+		// 在其中加入 adView
+		layout.addView(adView);
+
+		// 請求測試廣告
+		// AdRequest adRequest = new AdRequest();
+		// adRequest.addTestDevice(AdRequest.TEST_EMULATOR); // 模擬工具
+		// adRequest.addTestDevice("TEST_DEVICE_ID");
+		// adView.loadAd(adRequest);
+
+		// 啟用泛用請求，並隨廣告一起載入
+		adView.loadAd(new AdRequest());
+		// ---------------------------------------------------------------------
 
 		mOnOffButton = (ToggleButton) findViewById(R.id.running_state_toogle_button);
 		mOnOffButton.setOnCheckedChangeListener(this);
@@ -105,6 +134,12 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 			stopServer();
 		}
 
+	}
+
+	@Override
+	public void onDestroy() {
+		adView.destroy();
+		super.onDestroy();
 	}
 
 }

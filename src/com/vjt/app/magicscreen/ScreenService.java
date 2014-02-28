@@ -95,7 +95,8 @@ public class ScreenService extends Service implements SensorEventListener {
 				.getActivity(context, 0, intent, 0);
 
 		Notification noti;
-		if (Build.VERSION.SDK_INT >= 16) {
+		if (Build.VERSION.SDK_INT >= 16
+				|| getApplicationInfo().targetSdkVersion >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
 			noti = new Notification.Builder(context)
 					.setContentTitle(
 							context.getString(R.string.status_title_label))
@@ -107,8 +108,8 @@ public class ScreenService extends Service implements SensorEventListener {
 			long when = System.currentTimeMillis();
 			CharSequence contentTitle = context
 					.getString(R.string.status_title_label);
-			CharSequence text = context.getString(status_label);
-			CharSequence contentText = context.getString(R.string.app_name);
+			CharSequence text = context.getString(R.string.app_name);
+			CharSequence contentText = context.getString(status_label);
 
 			noti = new Notification(icon, text, when);
 			noti.setLatestEventInfo(this, contentTitle, contentText, pIntent);
