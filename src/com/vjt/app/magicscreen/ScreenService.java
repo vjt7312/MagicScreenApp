@@ -95,8 +95,7 @@ public class ScreenService extends Service implements SensorEventListener {
 				.getActivity(context, 0, intent, 0);
 
 		Notification noti;
-		if (Build.VERSION.SDK_INT >= 16
-				|| getApplicationInfo().targetSdkVersion >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
+		if (Build.VERSION.SDK_INT >= 16) {
 			noti = new Notification.Builder(context)
 					.setContentTitle(
 							context.getString(R.string.status_title_label))
