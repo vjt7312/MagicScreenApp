@@ -6,7 +6,8 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.view.View;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.SeekBar;
@@ -105,6 +106,25 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 			stopServer();
 		}
 
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.main, menu);
+		return true;
+	}
+
+	@Override
+	public boolean onMenuItemSelected(int featureId, MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.action_settings:
+			Intent launchNewIntent = new Intent(MainActivity.this,
+					ChooseSetting.class);
+			startActivityForResult(launchNewIntent, 0);
+			break;
+		}
+		return super.onMenuItemSelected(featureId, item);
 	}
 
 }
