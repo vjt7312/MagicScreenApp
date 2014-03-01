@@ -5,15 +5,12 @@ import java.util.List;
 
 import android.app.ListActivity;
 import android.app.ProgressDialog;
-import android.content.ActivityNotFoundException;
-import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.ListView;
-import android.widget.Toast;
+import android.view.Menu;
+import android.view.MenuItem;
 
 public class ChooseSetting extends ListActivity {
 	private PackageManager packageManager = null;
@@ -24,31 +21,11 @@ public class ChooseSetting extends ListActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.choose_setting);
+		getListView().setFastScrollEnabled(true);
 
 		packageManager = getPackageManager();
 
 		new LoadApplications().execute();
-	}
-
-	@Override
-	protected void onListItemClick(ListView l, View v, int position, long id) {
-		super.onListItemClick(l, v, position, id);
-
-		ApplicationInfo app = applist.get(position);
-		try {
-			Intent intent = packageManager
-					.getLaunchIntentForPackage(app.packageName);
-
-			if (null != intent) {
-				startActivity(intent);
-			}
-		} catch (ActivityNotFoundException e) {
-			Toast.makeText(ChooseSetting.this, e.getMessage(),
-					Toast.LENGTH_LONG).show();
-		} catch (Exception e) {
-			Toast.makeText(ChooseSetting.this, e.getMessage(),
-					Toast.LENGTH_LONG).show();
-		}
 	}
 
 	private List<ApplicationInfo> checkForLaunchIntent(
@@ -96,7 +73,7 @@ public class ChooseSetting extends ListActivity {
 		@Override
 		protected void onPreExecute() {
 			progress = ProgressDialog.show(ChooseSetting.this, null,
-					"Loading application info...");
+					getString(R.string.action_load));
 			super.onPreExecute();
 		}
 
@@ -104,5 +81,21 @@ public class ChooseSetting extends ListActivity {
 		protected void onProgressUpdate(Void... values) {
 			super.onProgressUpdate(values);
 		}
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.setting_main, menu);
+		return true;
+	}
+
+	@Override
+	public boolean onMenuItemSelected(int featureId, MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.mark_all:
+
+			break;
+		}
+		return super.onMenuItemSelected(featureId, item);
 	}
 }

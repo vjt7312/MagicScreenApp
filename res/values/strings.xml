@@ -10,7 +10,10 @@
     <string name="status_online_label">On</string>
     <string name="status_offline_label">Off</string>
     <string name="status_title_label">Smart Screen</string>
-    <string name="action_settings">Choose always on applications</string>
+    <string name="action_settings">Always on applications</string>
+    <string name="action_load">Loading ...</string>
+    <string name="mark_all">Mark all</string>
+    <string name="mark_all">Unmark all</string>
 
     <!-- Configuration values, do not translate -->
     <string name="onoff_default">off</string>
