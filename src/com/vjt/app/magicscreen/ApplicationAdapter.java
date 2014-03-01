@@ -62,4 +62,8 @@ public class ApplicationAdapter extends ArrayAdapter<ApplicationInfo> {
 		}
 		return view;
 	}
+
+	public void doMarkAll(boolean mark) {
+
+	}
 };

@@ -1,16 +1,21 @@
 package com.vjt.app.magicscreen;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.CheckBox;
+import android.widget.ListView;
 
 public class ChooseSetting extends ListActivity {
 	private PackageManager packageManager = null;
@@ -26,6 +31,14 @@ public class ChooseSetting extends ListActivity {
 		packageManager = getPackageManager();
 
 		new LoadApplications().execute();
+	}
+
+	@Override
+	protected void onListItemClick(ListView l, View v, int position, long id) {
+		super.onListItemClick(l, v, position, id);
+
+		ApplicationInfo app = applist.get(position);
+
 	}
 
 	private List<ApplicationInfo> checkForLaunchIntent(
@@ -52,6 +65,8 @@ public class ChooseSetting extends ListActivity {
 		protected Void doInBackground(Void... params) {
 			applist = checkForLaunchIntent(packageManager
 					.getInstalledApplications(PackageManager.GET_META_DATA));
+			Collections.sort(applist,
+					new ApplicationInfo.DisplayNameComparator(packageManager));
 			listadaptor = new ApplicationAdapter(ChooseSetting.this,
 					R.layout.snippet_list_row, applist);
 
@@ -93,7 +108,10 @@ public class ChooseSetting extends ListActivity {
 	public boolean onMenuItemSelected(int featureId, MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.mark_all:
-
+			listadaptor.doMarkAll(true);
+			break;
+		case R.id.unmark_all:
+			listadaptor.doMarkAll(false);
 			break;
 		}
 		return super.onMenuItemSelected(featureId, item);

@@ -13,7 +13,7 @@
     <string name="action_settings">Always on applications</string>
     <string name="action_load">Loading ...</string>
     <string name="mark_all">Mark all</string>
-    <string name="mark_all">Unmark all</string>
+    <string name="unmark_all">Unmark all</string>
 
     <!-- Configuration values, do not translate -->
     <string name="onoff_default">off</string>
