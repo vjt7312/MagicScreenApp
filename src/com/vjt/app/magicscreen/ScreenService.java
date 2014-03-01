@@ -1,5 +1,7 @@
 package com.vjt.app.magicscreen;
 
+import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -290,6 +292,14 @@ public class ScreenService extends Service implements SensorEventListener {
 			LogUtil.d(TAG, "x = " + x);
 			LogUtil.d(TAG, "y = " + y);
 			LogUtil.d(TAG, "z = " + z);
+
+			ActivityManager am = (ActivityManager) getSystemService(Activity.ACTIVITY_SERVICE);
+			String packageName = am.getRunningTasks(1).get(0).topActivity
+					.getPackageName();
+			String className = am.getRunningTasks(1).get(0).topActivity
+					.getClassName();
+			LogUtil.d(TAG, "packageName = " + packageName + ", className = "
+					+ className);
 
 			if (Math.abs(y) > mSensitivity) {
 				serviceStatus = STATUS_ON;
