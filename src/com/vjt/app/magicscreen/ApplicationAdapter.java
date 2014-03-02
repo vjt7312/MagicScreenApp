@@ -74,6 +74,7 @@ public class ApplicationAdapter extends ArrayAdapter<ApplicationInfo> {
 			SharedPreferences.Editor editor = settings.edit();
 			editor.putString("app_data", app_data);
 			editor.commit();
+			ScreenService.reloadCheckList();
 		}
 	}
 

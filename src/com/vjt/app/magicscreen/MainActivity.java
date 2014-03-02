@@ -73,9 +73,6 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 		super.onResume();
 
 		IntentFilter filter = new IntentFilter();
-		filter.addAction(ScreenService.ACTION_STARTED);
-		filter.addAction(ScreenService.ACTION_STOPPED);
-		filter.addAction(ScreenService.ACTION_OFFLINE);
 	}
 
 	@Override

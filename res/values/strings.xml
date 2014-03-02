@@ -9,6 +9,7 @@
     <string name="sensitivity_label">Sensitivity</string>
     <string name="status_online_label">On</string>
     <string name="status_offline_label">Off</string>
+    <string name="status_always_label">Always</string>
     <string name="status_title_label">Smart Screen</string>
     <string name="action_settings">Always on APP</string>
     <string name="action_load">Loading ...</string>
