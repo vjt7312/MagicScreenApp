@@ -9,6 +9,13 @@
     <string name="sensitivity_label">感度</string>
     <string name="status_online_label">アクティブ </string>
     <string name="status_offline_label">影響なし</string>
+    <string name="status_always_label">常にオン</string>
     <string name="status_title_label">スマートスクリーン</string>
+
+<string name="action_settings">常に開いているアプリケーション</string>
+    <string name="action_load">荷重 ...</string>
+    <string name="mark_all">マークのすべて</string>
+    <string name="unmark_all">すべて解除</string>
+    <string name="items">選択したプロジェクト:</string>
 
 </resources>

@@ -1,5 +1,9 @@
 package com.vjt.app.magicscreen;
 
+import java.util.StringTokenizer;
+
+import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -28,9 +32,6 @@ public class ScreenService extends Service implements SensorEventListener {
 
 	public static final String ACTION_STARTED = "com.vjt.app.magicscreen.STARTED";
 	public static final String ACTION_STOPPED = "com.vjt.app.magicscreen.STOPPED";
-	public static final String ACTION_ONLINE = "com.vjt.app.magicscreen.ONLINE";
-	public static final String ACTION_OFFLINE = "com.vjt.app.magicscreen.OFFLINE";
-	public static final String ACTION_BAD = "com.vjt.app.magicscreen.BAD";
 
 	public static final String ACTION_SCREEN_ON = "screen_on";
 	public static final String ACTION_SCREEN_OFF = "screen_off";
@@ -38,6 +39,7 @@ public class ScreenService extends Service implements SensorEventListener {
 	private static final int STATUS_NONE = 0;
 	private static final int STATUS_ON = 1;
 	private static final int STATUS_OFF = 2;
+	private static final int STATUS_ALWAYS_ON = 3;
 
 	private final int NOTIFICATIONID = 7656;
 
@@ -47,6 +49,7 @@ public class ScreenService extends Service implements SensorEventListener {
 	private static float mSensitivity;
 	private WakeLock mWakeLock;
 	private SensorManager mSensorManager;
+	private static String mChecklist;
 
 	private final IBinder binder = new InternetServiceBinder();
 
@@ -82,6 +85,10 @@ public class ScreenService extends Service implements SensorEventListener {
 		case ScreenService.STATUS_OFF:
 			icon = R.drawable.offline;
 			status_label = R.string.status_offline_label;
+			break;
+		case ScreenService.STATUS_ALWAYS_ON:
+			icon = R.drawable.always;
+			status_label = R.string.status_always_label;
 			break;
 		default:
 			icon = R.drawable.offline;
@@ -163,6 +170,7 @@ public class ScreenService extends Service implements SensorEventListener {
 		super.onStartCommand(intent, flags, startId);
 
 		cancelWatchdog();
+		reloadCheckList();
 
 		if (intent.getAction() == null
 				|| intent.getAction().equals(ACTION_SCREEN_ON)) {
@@ -200,9 +208,7 @@ public class ScreenService extends Service implements SensorEventListener {
 						.parseFloat(getString(R.string.sensitivity_2_default));
 				break;
 			}
-			mSensorManager.registerListener(this,
-					mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
-					SensorManager.SENSOR_DELAY_NORMAL);
+			doCheck();
 		} else if (intent.getAction().equals(ACTION_STOPPED)) {
 			stopSelf(startId);
 			return START_NOT_STICKY;
@@ -222,6 +228,46 @@ public class ScreenService extends Service implements SensorEventListener {
 				PendingIntent.FLAG_UPDATE_CURRENT);
 
 		return pi;
+	}
+
+	private void doCheck() {
+
+		boolean found = false;
+
+		ActivityManager am = (ActivityManager) getSystemService(Activity.ACTIVITY_SERVICE);
+		String packageName = am.getRunningTasks(1).get(0).topActivity
+				.getPackageName();
+		String className = am.getRunningTasks(1).get(0).topActivity
+				.getClassName();
+		LogUtil.d(TAG, "packageName = " + packageName + ", className = "
+				+ className);
+
+		StringTokenizer st = new StringTokenizer(mChecklist, ":");
+
+		while (st.hasMoreTokens()) {
+			String token = st.nextToken();
+			if (token.equals(packageName)) {
+				int oldServerStatus = serviceStatus;
+				LogUtil.d(TAG, "serviceStatus = " + serviceStatus);
+				serviceStatus = STATUS_ALWAYS_ON;
+				found = true;
+				if (oldServerStatus != serviceStatus) {
+					setupNotification(this, STATUS_ALWAYS_ON);
+				}
+				break;
+			}
+		}
+		if (found) {
+			mSensorManager.unregisterListener(this);
+			acquireWakeLock();
+			releaseWakeLock();
+			acquireWakeLock();
+			setWatchdog(mFrequency * 1000);
+		} else {
+			mSensorManager.registerListener(this,
+					mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
+					SensorManager.SENSOR_DELAY_NORMAL);
+		}
 	}
 
 	private void cancelWatchdog() {
@@ -293,16 +339,16 @@ public class ScreenService extends Service implements SensorEventListener {
 
 			if (Math.abs(y) > mSensitivity) {
 				serviceStatus = STATUS_ON;
+				acquireWakeLock();
+				releaseWakeLock();
+				acquireWakeLock();
 				if (oldServiceStatus != serviceStatus) {
-					acquireWakeLock();
-					releaseWakeLock();
-					acquireWakeLock();
 					setupNotification(this, STATUS_ON);
 				}
 			} else {
 				serviceStatus = STATUS_OFF;
+				releaseWakeLock();
 				if (oldServiceStatus != serviceStatus) {
-					releaseWakeLock();
 					setupNotification(this, STATUS_OFF);
 				}
 			}
@@ -310,6 +356,12 @@ public class ScreenService extends Service implements SensorEventListener {
 		LogUtil.d(TAG, "serviceStatus = " + serviceStatus);
 		mSensorManager.unregisterListener(this);
 		setWatchdog(mFrequency * 1000);
+	}
+
+	public static void reloadCheckList() {
+		SharedPreferences settings = PreferenceManager
+				.getDefaultSharedPreferences(MyApplication.getAppContext());
+		mChecklist = settings.getString("app_data", "");
 	}
 
 }

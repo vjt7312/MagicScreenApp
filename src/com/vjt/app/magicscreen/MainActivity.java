@@ -6,6 +6,8 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.LinearLayout;
@@ -101,9 +103,6 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 		super.onResume();
 
 		IntentFilter filter = new IntentFilter();
-		filter.addAction(ScreenService.ACTION_STARTED);
-		filter.addAction(ScreenService.ACTION_STOPPED);
-		filter.addAction(ScreenService.ACTION_OFFLINE);
 	}
 
 	@Override
@@ -134,6 +133,24 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 			stopServer();
 		}
 
+	}
+
+        @Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.main, menu);
+		return true;
+	}
+
+	@Override
+	public boolean onMenuItemSelected(int featureId, MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.action_settings:
+			Intent launchNewIntent = new Intent(MainActivity.this,
+					ChooseSetting.class);
+			startActivityForResult(launchNewIntent, 0);
+			break;
+		}
+		return super.onMenuItemSelected(featureId, item);
 	}
 
 	@Override
