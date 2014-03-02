@@ -35,14 +35,12 @@ public class ChooseSetting extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		LogUtil.d(TAG, "onCreate");
+		packageManager = getPackageManager();
+
 		setContentView(R.layout.choose_setting);
 		lv = (ListView) findViewById(R.id.list);
 		tv = (TextView) findViewById(R.id.count);
 		lv.setFastScrollEnabled(true);
-
-		packageManager = getPackageManager();
-		refreshCount();
-
 		lv.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
@@ -62,6 +60,14 @@ public class ChooseSetting extends Activity {
 		});
 
 		new LoadApplications().execute();
+	}
+
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		LogUtil.d(TAG, "onDestroy");
+
+		listadaptor.saveData();
 	}
 
 	private List<ApplicationInfo> checkForLaunchIntent(
@@ -104,6 +110,8 @@ public class ChooseSetting extends Activity {
 		@Override
 		protected void onPostExecute(Void result) {
 			lv.setAdapter(listadaptor);
+			checkNum = listadaptor.getChecked();
+			refreshCount();
 			progress.dismiss();
 			super.onPostExecute(result);
 		}

@@ -1,11 +1,14 @@
 package com.vjt.app.magicscreen;
 
-import java.util.HashMap;
 import java.util.List;
+import java.util.StringTokenizer;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.preference.PreferenceManager;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,32 +19,73 @@ import android.widget.TextView;
 
 public class ApplicationAdapter extends ArrayAdapter<ApplicationInfo> {
 
-	private static HashMap<Integer, Boolean> isSelected;
-	private List<ApplicationInfo> appsList = null;
+	private static SparseBooleanArray isSelected;
+	private List<ApplicationInfo> appsList;
 	private Context context;
 	private PackageManager packageManager;
+	private int checkedCount;
 
 	public ApplicationAdapter(Context context, int textViewResourceId,
 			List<ApplicationInfo> appsList) {
 		super(context, textViewResourceId, appsList);
 		this.context = context;
 		this.appsList = appsList;
-		isSelected = new HashMap<Integer, Boolean>();
+		isSelected = new SparseBooleanArray();
 		packageManager = context.getPackageManager();
-		initDate();
+		initData();
 	}
 
-	private void initDate() {
+	private void initData() {
+
 		for (int i = 0; i < appsList.size(); i++) {
 			getIsSelected().put(i, false);
 		}
+
+		SharedPreferences settings = PreferenceManager
+				.getDefaultSharedPreferences(context);
+		String app_data = settings.getString("app_data", "");
+		if (app_data != null && app_data.length() > 0) {
+			StringTokenizer st = new StringTokenizer(app_data, ":");
+			while (st.hasMoreTokens()) {
+				String token = st.nextToken();
+				for (int i = 0; i < appsList.size(); i++) {
+					ApplicationInfo data = appsList.get(i);
+					if (data.packageName.equals(token)) {
+						getIsSelected().put(i, true);
+						checkedCount++;
+					}
+				}
+			}
+		}
 	}
 
-	public static HashMap<Integer, Boolean> getIsSelected() {
+	public void saveData() {
+		String app_data = "";
+
+		for (int i = 0; i < getIsSelected().size(); i++) {
+			if (getIsSelected().get(i)) {
+				ApplicationInfo data = appsList.get(i);
+				app_data += data.packageName + ":";
+			}
+		}
+		if (app_data != null) {
+			SharedPreferences settings = PreferenceManager
+					.getDefaultSharedPreferences(context);
+			SharedPreferences.Editor editor = settings.edit();
+			editor.putString("app_data", app_data);
+			editor.commit();
+		}
+	}
+
+	public int getChecked() {
+		return checkedCount;
+	}
+
+	public static SparseBooleanArray getIsSelected() {
 		return isSelected;
 	}
 
-	public static void setIsSelected(HashMap<Integer, Boolean> isSelected) {
+	public static void setIsSelected(SparseBooleanArray isSelected) {
 		ApplicationAdapter.isSelected = isSelected;
 	}
 
