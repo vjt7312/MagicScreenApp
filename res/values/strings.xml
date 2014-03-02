@@ -15,7 +15,7 @@
     <string name="action_load">Loading ...</string>
     <string name="mark_all">Mark all</string>
     <string name="unmark_all">Unmark all</string>
-    <string name="items">Items seleted:</string>
+    <string name="items">Items selected:</string>
 
     <!-- Configuration values, do not translate -->
     <string name="onoff_default">off</string>

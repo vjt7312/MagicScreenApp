@@ -9,6 +9,12 @@
     <string name="sensitivity_label">灵敏度</string>
     <string name="status_online_label">作用中</string>
     <string name="status_offline_label">无作用</string>
+    <string name="status_always_label">永远开启</string>
     <string name="status_title_label">智慧萤幕</string>
+    <string name="action_settings">永远开启的应用程式</string>
+    <string name="action_load">加载中 ...</string>
+    <string name="mark_all">标记全部</string>
+    <string name="unmark_all">全部取消</string>
+    <string name="items">已选定的项目:</string>
 
 </resources>
