@@ -50,6 +50,7 @@ public class ScreenService extends Service implements SensorEventListener {
 	private WakeLock mWakeLock;
 	private SensorManager mSensorManager;
 	private static String mChecklist;
+	private static boolean mOnOff;
 
 	private final IBinder binder = new InternetServiceBinder();
 
@@ -172,10 +173,23 @@ public class ScreenService extends Service implements SensorEventListener {
 		cancelWatchdog();
 		reloadCheckList();
 
+		PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+		SharedPreferences settings = PreferenceManager
+				.getDefaultSharedPreferences(this);
+		mOnOff = settings.getString("onoff", "off").equals("on");
+
+		if (!pm.isScreenOn()) {
+			resetStatus();
+			return START_REDELIVER_INTENT;
+		}
+
+		if (!mOnOff) {
+			stopSelf(startId);
+			return START_NOT_STICKY;
+		}
+
 		if (intent.getAction() == null
 				|| intent.getAction().equals(ACTION_SCREEN_ON)) {
-			SharedPreferences settings = PreferenceManager
-					.getDefaultSharedPreferences(this);
 
 			int f = (settings.getInt("frenqucy", 1));
 			switch (f) {
