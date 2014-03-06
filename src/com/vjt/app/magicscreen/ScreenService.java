@@ -104,7 +104,7 @@ public class ScreenService extends Service implements SensorEventListener {
 		PendingIntent pIntent = PendingIntent
 				.getActivity(context, 0, intent, 0);
 
-		if (Build.VERSION.SDK_INT >= 16) {
+		if (Build.VERSION.SDK_INT >= 16 && mNoti != null) {
 			mNoti = new Notification.Builder(context)
 					.setContentTitle(
 							context.getString(R.string.status_title_label))
@@ -128,7 +128,6 @@ public class ScreenService extends Service implements SensorEventListener {
 		mNoti.flags |= Notification.FLAG_ONLY_ALERT_ONCE;
 		nm.notify(NOTIFICATIONID, mNoti);
 		startForeground(NOTIFICATIONID, mNoti);
-
 	}
 
 	private void clearNotification(Context context) {
