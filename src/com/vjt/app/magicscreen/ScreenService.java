@@ -51,6 +51,8 @@ public class ScreenService extends Service implements SensorEventListener {
 	private SensorManager mSensorManager;
 	private static String mChecklist;
 	private static boolean mOnOff;
+	private Object mBuilder;
+	private Notification mNoti = new Notification();
 
 	private final IBinder binder = new InternetServiceBinder();
 
@@ -103,8 +105,8 @@ public class ScreenService extends Service implements SensorEventListener {
 				.getActivity(context, 0, intent, 0);
 
 		Notification noti;
-		if (Build.VERSION.SDK_INT >= 16) {
-			noti = new Notification.Builder(context)
+		if (Build.VERSION.SDK_INT >= 16 && mBuilder != null) {
+			noti = ((Notification.Builder) mBuilder)
 					.setContentTitle(
 							context.getString(R.string.status_title_label))
 					.setContentIntent(pIntent)
@@ -121,7 +123,8 @@ public class ScreenService extends Service implements SensorEventListener {
 			noti = new Notification(icon, text, when);
 			noti.setLatestEventInfo(this, contentTitle, contentText, pIntent);
 		}
-		noti.flags = Notification.FLAG_NO_CLEAR;
+		noti.flags |= Notification.FLAG_NO_CLEAR;
+		noti.flags |= Notification.FLAG_ONLY_ALERT_ONCE;
 		nm.notify(NOTIFICATIONID, noti);
 		startForeground(NOTIFICATIONID, noti);
 
@@ -164,6 +167,8 @@ public class ScreenService extends Service implements SensorEventListener {
 		filter.addAction(Intent.ACTION_SCREEN_ON);
 		filter.addAction(Intent.ACTION_SCREEN_OFF);
 		registerReceiver(receiver, filter);
+		if (Build.VERSION.SDK_INT >= 16)
+			mBuilder = new Notification.Builder(this);
 	}
 
 	@Override
