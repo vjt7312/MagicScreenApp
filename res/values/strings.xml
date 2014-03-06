@@ -12,7 +12,7 @@
     <string name="status_always_label">Always</string>
     <string name="status_title_label">Smart Screen</string>
 
-<string name="action_settings">Always on APP</string>
+    <string name="action_settings">Always on APP</string>
     <string name="action_load">Loading ...</string>
     <string name="mark_all">Mark all</string>
     <string name="unmark_all">Unmark all</string>

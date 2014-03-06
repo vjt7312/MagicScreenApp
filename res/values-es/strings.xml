@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">elegante de la pantalla</string>
+    <string name="interval_label">Compruebe la frecuencia</string>
+    <string name="interval_0_label">bajo</string>
+    <string name="interval_1_label">medio</string>
+    <string name="interval_2_label">alto</string>
+    <string name="sensitivity_label">sensibilidad</string>
+    <string name="status_online_label">en</string>
+    <string name="status_offline_label">apagado</string>
+    <string name="status_always_label">siempre</string>
+    <string name="status_title_label">siempre</string>
+    <string name="action_settings">Siempre en APP</string>
+    <string name="action_load">Loading ...</string>
+    <string name="mark_all">Marque todas las</string>
+    <string name="unmark_all">Desmarcar todos</string>
+    <string name="items">Artículos seleccionados:</string>
+
+</resources>
