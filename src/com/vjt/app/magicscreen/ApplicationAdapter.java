@@ -15,15 +15,19 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.ImageView;
+import android.widget.SectionIndexer;
 import android.widget.TextView;
 
-public class ApplicationAdapter extends ArrayAdapter<ApplicationInfo> {
+public class ApplicationAdapter extends ArrayAdapter<ApplicationInfo> implements
+		SectionIndexer {
 
 	private static SparseBooleanArray isSelected;
 	private List<ApplicationInfo> appsList;
 	private Context context;
 	private PackageManager packageManager;
 	private int checkedCount;
+	private int mSections[];
+	private String[] mAlphabetArray;
 
 	public ApplicationAdapter(Context context, int textViewResourceId,
 			List<ApplicationInfo> appsList) {
@@ -37,8 +41,35 @@ public class ApplicationAdapter extends ArrayAdapter<ApplicationInfo> {
 
 	private void initData() {
 
+		int charCount = 0;
+		String lastString = null;
 		for (int i = 0; i < appsList.size(); i++) {
 			getIsSelected().put(i, false);
+
+			ApplicationInfo data = appsList.get(i);
+			String labelStart = Character.toString(data.loadLabel(
+					packageManager).charAt(0));
+			if (!labelStart.equals(lastString)) {
+				charCount++;
+			}
+			lastString = labelStart;
+		}
+
+		mAlphabetArray = new String[charCount];
+		mSections = new int[charCount];
+		for (int i = 0, k = 0; i < appsList.size(); i++) {
+			ApplicationInfo data = appsList.get(i);
+			String labelStart = Character.toString(data.loadLabel(
+					packageManager).charAt(0));
+			if (k >= 1 && labelStart.equals(mAlphabetArray[k - 1])) {
+				mSections[k - 1] = i;
+				continue;
+			} else {
+				mAlphabetArray[k] = Character.toString(data.loadLabel(
+						packageManager).charAt(0));
+				mSections[k] = i;
+				k++;
+			}
 		}
 
 		SharedPreferences settings = PreferenceManager
@@ -141,5 +172,24 @@ public class ApplicationAdapter extends ArrayAdapter<ApplicationInfo> {
 		TextView packageName;
 		ImageView ic;
 		CheckBox cb;
+	}
+
+	@Override
+	public int getPositionForSection(int section) {
+		return mSections[section];
+	}
+
+	@Override
+	public int getSectionForPosition(int position) {
+		for (int i = 0; i < mSections.length; i++) {
+			if (mSections[i] >= position)
+				return i;
+		}
+		return 0;
+	}
+
+	@Override
+	public Object[] getSections() {
+		return mAlphabetArray;
 	}
 };
