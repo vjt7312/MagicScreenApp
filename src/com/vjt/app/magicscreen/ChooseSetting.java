@@ -40,7 +40,6 @@ public class ChooseSetting extends Activity {
 		setContentView(R.layout.choose_setting);
 		lv = (ListView) findViewById(R.id.list);
 		tv = (TextView) findViewById(R.id.count);
-		lv.setFastScrollEnabled(true);
 		lv.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
@@ -110,6 +109,8 @@ public class ChooseSetting extends Activity {
 		@Override
 		protected void onPostExecute(Void result) {
 			lv.setAdapter(listadaptor);
+			lv.setFastScrollEnabled(true);
+			lv.setFastScrollAlwaysVisible(true);
 			checkNum = listadaptor.getChecked();
 			refreshCount();
 			progress.dismiss();
