@@ -128,7 +128,6 @@ public class ScreenService extends Service implements SensorEventListener {
 		mNoti.flags |= Notification.FLAG_ONLY_ALERT_ONCE;
 		nm.notify(NOTIFICATIONID, mNoti);
 		startForeground(NOTIFICATIONID, mNoti);
-
 	}
 
 	private void clearNotification(Context context) {
