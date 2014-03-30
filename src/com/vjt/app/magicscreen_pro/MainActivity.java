@@ -1,4 +1,6 @@
-package com.vjt.app.magicscreen;
+package com.vjt.app.magicscreen_pro;
+
+import com.vjt.app.magicscreen.R;
 
 import android.app.Activity;
 import android.content.Intent;

@@ -1,7 +1,9 @@
-package com.vjt.app.magicscreen;
+package com.vjt.app.magicscreen_pro;
 
 import java.util.List;
 import java.util.StringTokenizer;
+
+import com.vjt.app.magicscreen.R;
 
 import android.content.Context;
 import android.content.SharedPreferences;

@@ -20,13 +20,13 @@
         android:targetSdkVersion="17" />
 
     <application
-        android:name="com.vjt.app.magicscreen.MyApplication"
+        android:name="com.vjt.app.magicscreen_pro.MyApplication"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="com.vjt.app.magicscreen.MainActivity"
+            android:name="com.vjt.app.magicscreen_pro.MainActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -35,7 +35,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.vjt.app.magicscreen.ChooseSetting"
+            android:name="com.vjt.app.magicscreen_pro.ChooseSetting"
             android:label="@string/action_settings" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -43,11 +43,11 @@
         </activity>
 
         <service
-            android:name="com.vjt.app.magicscreen.ScreenService"
+            android:name="com.vjt.app.magicscreen_pro.ScreenService"
             android:enabled="true" />
 
         <receiver
-            android:name="com.vjt.app.magicscreen.BootReceiver"
+            android:name="com.vjt.app.magicscreen_pro.BootReceiver"
             android:label="BootReceiver" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
