@@ -18,7 +18,6 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.vjt.app.magicscreen.R;
 import com.vjt.app.magicscreen_pro.ApplicationAdapter.ViewHolder;
 
 public class ChooseSetting extends Activity {

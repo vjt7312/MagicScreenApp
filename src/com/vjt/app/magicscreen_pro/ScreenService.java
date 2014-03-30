@@ -2,8 +2,6 @@ package com.vjt.app.magicscreen_pro;
 
 import java.util.StringTokenizer;
 
-import com.vjt.app.magicscreen.R;
-
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.AlarmManager;
