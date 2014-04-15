@@ -32,14 +32,20 @@
             android:id="@+id/app_name"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:ellipsize="end"
             android:gravity="center_vertical"
+            android:lines="1"
+            android:singleLine="true"
             android:textAppearance="?android:attr/textAppearanceLarge" />
 
         <TextView
             android:id="@+id/app_paackage"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical" />
+            android:ellipsize="end"
+            android:gravity="center_vertical"
+            android:lines="1"
+            android:singleLine="true" />
     </LinearLayout>
 
 </LinearLayout>

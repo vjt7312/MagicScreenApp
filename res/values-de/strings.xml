@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Smart-Screen-</string>
+    <string name="interval_label">Überprüfen Frequenz</string>
+    <string name="interval_0_label">niedrig </string>
+    <string name="interval_1_label">Medium</string>
+    <string name="interval_2_label">hoch</string>
+    <string name="sensitivity_label">Empfindlichkeit</string>
+    <string name="status_online_label">auf</string>
+    <string name="status_offline_label">aus</string>
+    <string name="status_always_label">immer</string>
+    <string name="status_title_label">Smart-Screen-</string>
+    <string name="action_settings">Immer auf APP</string>
+    <string name="action_load">Wird geladen ...</string>
+    <string name="mark_all">markieren Sie alle</string>
+    <string name="unmark_all">nicht markieren</string>
+    <string name="items">Ausgewählte Artikel:</string>
+
+</resources>
