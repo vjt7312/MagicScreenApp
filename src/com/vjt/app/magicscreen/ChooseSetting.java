@@ -9,6 +9,7 @@ import android.app.ProgressDialog;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -110,7 +111,9 @@ public class ChooseSetting extends Activity {
 		protected void onPostExecute(Void result) {
 			lv.setAdapter(listadaptor);
 			lv.setFastScrollEnabled(true);
-			lv.setFastScrollAlwaysVisible(true);
+			if (Build.VERSION.SDK_INT >= 11) {
+				lv.setFastScrollAlwaysVisible(true);
+			}
 			checkNum = listadaptor.getChecked();
 			refreshCount();
 			progress.dismiss();
