@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <lint>
     <issue id="NewApi">
+        <ignore path="src/com/vjt/app/magicscreen/ChooseSetting.java" />
         <ignore path="src/com/vjt/app/magicscreen/InternetService.java" />
         <ignore path="src/com/vjt/app/magicscreen/ScreenService.java" />
+        <ignore path="src/com/vjt/app/magicscreen_pro/ChooseSetting.java" />
     </issue>
 </lint>
